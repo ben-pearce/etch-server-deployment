@@ -1,0 +1,12 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "repositories": ["ben-pearce/server-deployment-template"],
+  "docker-compose": {
+    "fileMatch": [
+      "(^|/)(?:docker-)?compose[^/]*(\\..+)?\\.ya?ml$"
+    ]
+  }
+}
