@@ -3,7 +3,7 @@
   "extends": [
     "config:recommended"
   ],
-  "repositories": ["ben-pearce/server-deployment-template"],
+  "repositories": ["ben-pearce/etch-server-deployment"],
   "docker-compose": {
     "fileMatch": [
       "(^|/)(?:docker-)?compose[^/]*(\\..+)?\\.ya?ml$"

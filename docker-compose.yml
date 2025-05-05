@@ -1,0 +1,71 @@
+name: etch-server-deployment
+services:
+  adguardhome:
+    image: adguard/adguardhome:v0.107.61@sha256:a2085b04bbfc4759e68fa1d13d4e1558aede67c783c55820e036a95a36dd3ebf
+    container_name: adguardhome
+    volumes:
+      - ${DATA_DIR}/adguardhome:/opt/adguardhome/work
+      - ${CONFIG_DIR}/adguardhome:/opt/adguardhome/conf
+      - ${DATA_DIR}/certbot:/etc/letsencrypt
+    # dclint disable-line no-unbound-port-interfaces
+    ports:
+      - '${DNS_INTERFACE}:53:53/tcp'
+      - '${DNS_INTERFACE}:53:53/udp'
+      - '${DNS_INTERFACE}:853:853/tcp'
+      - '0.0.0.0:80:80'
+      - '0.0.0.0:443:443'
+    restart: unless-stopped
+    labels:
+      readme.description: Network-wide ads & trackers blocking DNS server.
+      readme.links.docker: https://hub.docker.com/r/adguard/adguardhome
+  certbot:
+    image: certbot/dns-cloudflare:v4.0.0@sha256:d2b69333e562fb548f9f8150d5b2b71728348738c0fe9fa2afe6c29c26906f2c
+    container_name: certbot
+    volumes:
+      - ${DATA_DIR}/certbot:/etc/letsencrypt
+      - ./certbot/renewal-hooks:/etc/letsencrypt/renewal-hooks
+      - ./certbot/entrypoint.sh:/entrypoint.sh
+      - /var/run/docker.sock:/var/run/docker.sock
+    secrets:
+      - certbot_cloudflare
+    entrypoint: /entrypoint.sh
+    labels:
+      readme.description: ACME client with DNS challenge support for Cloudflare.
+      readme.links.docker: https://hub.docker.com/r/certbot/dns-cloudflare
+    privileged: true
+  zabbix-agent:
+    image: zabbix/zabbix-agent:7.2.6-alpine@sha256:a2e6cee4e13fa57851775aa2f04bb56da47320680e7247d75c8e3c3c354e47da
+    container_name: zabbix-agent
+    volumes:
+      - /dev:/dev:ro
+      - /boot:/boot:ro
+      - /etc/passwd:/etc/passwd:ro
+    secrets:
+      - zabbix_agent_psk
+    environment:
+      ZBX_SERVER_HOST: ${ZBX_SERVER_HOST}
+      ZBX_HOSTNAME: etch
+      ZBX_STARTAGENTS: 0
+      ZBX_PASSIVE_ALLOW: false
+      ZBX_REFRESHACTIVECHECKS: ${ZBX_REFRESHACTIVECHECKS}
+      ZBX_TLSPSKIDENTITY: etch
+      ZBX_TLSCONNECT: psk
+      ZBX_TLSACCEPT: psk
+      ZBX_TLSPSKFILE: /run/secrets/zabbix_agent_psk
+    networks:
+      - zabbix
+    restart: unless-stopped
+    labels:
+      readme.description: Zabbix agent for monitoring.
+      readme.links.docker: https://hub.docker.com/r/zabbix/zabbix-agent
+    user: ${PUID}:${PGID}
+    hostname: etch
+    privileged: true
+networks:
+  zabbix:
+    name: zabbix
+secrets:
+  certbot_cloudflare:
+    file: ./.secrets/certbot_cloudflare
+  zabbix_agent_psk:
+    file: ./.secrets/zabbix_agent_psk
