@@ -40,6 +40,7 @@ services:
       - /dev:/dev:ro
       - /boot:/boot:ro
       - /etc/passwd:/etc/passwd:ro
+      - /mnt:/mnt:ro
     secrets:
       - zabbix_agent_psk
     environment:
@@ -52,8 +53,7 @@ services:
       ZBX_TLSCONNECT: psk
       ZBX_TLSACCEPT: psk
       ZBX_TLSPSKFILE: /run/secrets/zabbix_agent_psk
-    networks:
-      - zabbix
+    network_mode: host
     restart: unless-stopped
     labels:
       readme.description: Zabbix agent for monitoring.
@@ -61,9 +61,6 @@ services:
     user: ${PUID}:${PGID}
     hostname: etch
     privileged: true
-networks:
-  zabbix:
-    name: zabbix
 secrets:
   certbot_cloudflare:
     file: ./.secrets/certbot_cloudflare
