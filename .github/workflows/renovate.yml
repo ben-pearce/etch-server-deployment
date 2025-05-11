@@ -3,7 +3,7 @@ name: 🤖 Automated Dependency Updates
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * 6'
+    - cron: '0 0 * * 6' # Every Saturday at midnight UTC
 
 jobs:
   renovate:
