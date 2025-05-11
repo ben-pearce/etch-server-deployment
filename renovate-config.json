@@ -1,11 +1,5 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
-  "repositories": ["ben-pearce/etch-server-deployment"],
-  "docker-compose": {
-    "managerFilePatterns": ["/(^|/)(?:docker-)?compose[^/]*(\\..+)?\\.ya?ml$/"]
-  },
-  "github-actions": {
-    "enabled": false
-  }
+  "extends": ["config:recommended", "github>ben-pearce/server-deployment-template:renovate-default"],
+  "repositories": ["ben-pearce/etch-server-deployment"]
 }
