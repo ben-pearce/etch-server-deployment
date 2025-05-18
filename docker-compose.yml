@@ -61,6 +61,22 @@ services:
     user: ${PUID}:${PGID}
     hostname: etch
     privileged: true
+  portainer-agent:
+    image: portainer/agent:2.30.0@sha256:bd90dc49a704273f201b8753735cb7c196d2a5081de18dedde1ff8bb8b3c570c
+    container_name: portainer-agent
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+      - /:/host:ro
+      - ${DATA_DIR}/portainer-agent:/data
+    environment:
+      EDGE: 1
+      EDGE_INSECURE_POLL: 1
+    env_file: ./.secrets/portainer_agent_key
+    restart: unless-stopped
+    labels:
+      readme.description: Portainer edge agent.
+      readme.links.github: https://github.com/portainer/agent
 secrets:
   certbot_cloudflare:
     file: ./.secrets/certbot_cloudflare
