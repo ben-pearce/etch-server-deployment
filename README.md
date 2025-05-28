@@ -18,9 +18,9 @@ The `.env` file stores environment variables to make starting the containers eas
 |---|---|---|
 | `PUID` | System user ID to run containers as. | `1000` |
 | `PGID` | System group ID to run containers as. | `1000` |
-| `DNS_INTERFACE` | Interface to listen for DNS requests on. | `10.0.0.0` |
-| `CONFIG_DIR` | Location of config storage on host. | `.config` |
-| `DATA_DIR` | Location of data storage on host. | `.data` |
+| `DNS_INTERFACE` | Interface to listen for DNS requests on. | `0.0.0.0` |
+| `CONFIG_DIR` | Location of config storage on host. | `config` |
+| `DATA_DIR` | Location of data storage on host. | `data` |
 | `ZBX_HOSTNAME` | Zabbix server hostname. | `zabbix-server` |
 | `ZBX_SERVER_HOST` | Zabbix monitoring server host. | `zabbix.example.com` |
 | `ZBX_REFRESHACTIVECHECKS` | Zabbix active check interval. | `60` |
