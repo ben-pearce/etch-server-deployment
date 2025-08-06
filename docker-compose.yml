@@ -1,6 +1,6 @@
 name: etch-server-deployment
 include:
-  - docker-compose.monitoring.yml
+  - stacks/docker-compose.monitoring.yml
 services:
   adguardhome:
     image: adguard/adguardhome:v0.107.64@sha256:23243d0004d9398cf9c83bdfce3dd92005df72aef010f537e7325a021f31a6f5
