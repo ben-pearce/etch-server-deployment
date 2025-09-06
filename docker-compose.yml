@@ -21,7 +21,7 @@ services:
       readme.description: Network-wide ads & trackers blocking DNS server.
       readme.links.docker: https://hub.docker.com/r/adguard/adguardhome
   certbot:
-    image: certbot/dns-cloudflare:v4.2.0@sha256:741896d9e490b4417c9c2e5eb5aa1c007b6f6a754d57edf7a9bbd8eb3874a057
+    image: certbot/dns-cloudflare:v5.0.0@sha256:0dbdb8667052256f5ebdd8a56bbf24cf80b6045a9520fdfb5575c087011341ee
     container_name: certbot
     volumes:
       - ${DATA_DIR}/certbot:/etc/letsencrypt
