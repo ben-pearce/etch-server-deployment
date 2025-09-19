@@ -1,0 +1,30 @@
+name: adguardhome
+services:
+  adguardhome:
+    image: adguard/adguardhome:v0.107.65@sha256:d765078d2140b464ce837128a4f536f80b4c9ab7fd5b6833ae690b72fae40897
+    container_name: adguardhome
+    volumes:
+      - ${DATA_DIR}/adguardhome:/opt/adguardhome/work
+      - ${CONFIG_DIR}/adguardhome:/opt/adguardhome/conf
+    # dclint disable-line no-unbound-port-interfaces
+    ports:
+      - '${DNS_INTERFACE}:53:53/tcp'
+      - '${DNS_INTERFACE}:53:53/udp'
+    networks:
+      - adguardhome-web
+    restart: unless-stopped
+    labels:
+      traefik.enable: true
+      traefik.http.routers.adguardhome.entrypoints: https
+      traefik.http.routers.adguardhome.rule: Host(`adguard.${HOST}`)
+      traefik.http.services.adguardhome.loadbalancer.server.port: 80
+      traefik.tcp.routers.adguardhome-dns.entrypoints: dns
+      traefik.tcp.routers.adguardhome-dns.rule: HostSNI(`adguard.${HOST}`)
+      traefik.tcp.routers.adguardhome-dns.tls: true
+      traefik.tcp.routers.adguardhome-dns.service: adguardhome-dns
+      traefik.tcp.services.adguardhome-dns.loadbalancer.server.port: 53
+      readme.description: Network-wide ads & trackers blocking DNS server.
+      readme.links.docker: https://hub.docker.com/r/adguard/adguardhome
+networks:
+  adguardhome-web:
+    name: adguardhome-web
