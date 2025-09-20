@@ -20,6 +20,7 @@ services:
     ports:
       - '0.0.0.0:80:80'
       - '0.0.0.0:443:443'
+      - '0.0.0.0:636:636'
       - '${DNS_INTERFACE}:853:853/tcp'
     networks:
       - adguardhome-web
@@ -39,6 +40,7 @@ services:
       - '--entrypoints.https.http.tls.certResolver=resolver'
       - '--entrypoints.https.http.tls.domains[0].main=${HOST}'
       - '--entrypoints.https.http.tls.domains[0].sans=*.${HOST}'
+      - '--entrypoints.ldaps.address=:636'
       - '--entrypoints.dns.address=:853'
       - '--certificatesresolvers.resolver.acme.dnschallenge=true'
       - '--certificatesresolvers.resolver.acme.dnschallenge.provider=cloudflare'

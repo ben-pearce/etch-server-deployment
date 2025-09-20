@@ -107,7 +107,6 @@ services:
       AUTHENTIK_EMAIL__USE_SSL: true
       AUTHENTIK_EMAIL__FROM: ${SMTP_USER}
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
       - ${DATA_DIR}/authentik/media:/media
       - ${DATA_DIR}/authentik/certs:/certs
       - ${DATA_DIR}/authentik/templates:/templates
@@ -118,6 +117,27 @@ services:
     networks:
       - authentik
     restart: unless-stopped
+  authentik-ldap:
+    image: ghcr.io/goauthentik/ldap:2025.8.3@sha256:7f6c754dfcbb538e2511803085f95253735843c8b873c2332c2ad291ae17d571
+    container_name: authentik-ldap
+    user: ${PUID}:${PGID}
+    ports:
+      - '0.0.0.0:389:3389/tcp'
+    environment:
+      AUTHENTIK_HOST: https://authentik.etch.benpearce.io
+      AUTHENTIK_TOKEN: file:///run/secrets/authentik_ldap_token
+    networks:
+      - authentik-web
+    secrets:
+      - authentik_ldap_token
+    restart: unless-stopped
+    labels:
+      traefik.enable: true
+      traefik.tcp.routers.authentik-ldap.entrypoints: ldaps
+      traefik.tcp.routers.authentik-ldap.rule: HostSNI(`authentik.${HOST}`)
+      traefik.tcp.routers.authentik-ldap.tls: true
+      traefik.tcp.routers.authentik-ldap.service: authentik-ldap
+      traefik.tcp.services.authentik-ldap.loadbalancer.server.port: 3389
 networks:
   authentik:
     name: authentik
@@ -126,6 +146,8 @@ networks:
 secrets:
   authentik_postgres_password:
     file: ../.secrets/authentik_postgres_password
+  authentik_ldap_token:
+    file: ../.secrets/authentik_ldap_token
   authentik_secret_key:
     file: ../.secrets/authentik_secret_key
   smtp_password:
