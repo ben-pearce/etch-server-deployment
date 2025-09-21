@@ -1,40 +1,64 @@
 name: etch-server-deployment
 include:
+  - stacks/docker-compose.adguardhome.yml
+  - stacks/docker-compose.authentik.yml
   - stacks/docker-compose.monitoring.yml
 services:
-  adguardhome:
-    image: adguard/adguardhome:v0.107.66@sha256:cc8757742e547c722bb0bd9a3b11fce22771a75a5b0e07ce9a789ad62a2bfd37
-    container_name: adguardhome
+  traefik:
+    image: traefik:v3.5.1@sha256:664bb8415fddadb71c2682b329c427d12c7d53593171665f2b7b6ff924509bc1
+    container_name: traefik
     volumes:
-      - ${DATA_DIR}/adguardhome:/opt/adguardhome/work
-      - ${CONFIG_DIR}/adguardhome:/opt/adguardhome/conf
-      - ${DATA_DIR}/certbot:/etc/letsencrypt
+      - ${DATA_DIR}/letsencrypt:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    secrets:
+      - cloudflare_dns_api_token
+      - cloudflare_zone_api_token
+    environment:
+      - CF_ZONE_API_TOKEN_FILE=/run/secrets/cloudflare_zone_api_token
+      - CF_DNS_API_TOKEN_FILE=/run/secrets/cloudflare_dns_api_token
     # dclint disable-line no-unbound-port-interfaces
     ports:
-      - '${DNS_INTERFACE}:53:53/tcp'
-      - '${DNS_INTERFACE}:53:53/udp'
-      - '${DNS_INTERFACE}:853:853/tcp'
       - '0.0.0.0:80:80'
       - '0.0.0.0:443:443'
+      - '0.0.0.0:636:636'
+      - '${DNS_INTERFACE}:853:853/tcp'
+    networks:
+      - adguardhome-web
+      - authentik-web
+    command:
+      - '--global.sendAnonymousUsage=false'
+      - '--api.insecure=true'
+      - '--api.dashboard=true'
+      - '--providers.docker=true'
+      - '--providers.docker.exposedbydefault=false'
+      - '--entrypoints.http.address=:80'
+      - '--entrypoints.http.http.redirections.entrypoint.to=https'
+      - '--entrypoints.http.http.redirections.entrypoint.scheme=https'
+      - '--entrypoints.https.address=:443'
+      - '--entrypoints.https.forwardedheaders.trustedips=${LAN_SUBNET}'
+      - '--entrypoints.https.http.tls=true'
+      - '--entrypoints.https.http.tls.certResolver=resolver'
+      - '--entrypoints.https.http.tls.domains[0].main=${HOST}'
+      - '--entrypoints.https.http.tls.domains[0].sans=*.${HOST}'
+      - '--entrypoints.ldaps.address=:636'
+      - '--entrypoints.dns.address=:853'
+      - '--certificatesresolvers.resolver.acme.dnschallenge=true'
+      - '--certificatesresolvers.resolver.acme.dnschallenge.provider=cloudflare'
+      - '--certificatesresolvers.resolver.acme.email=${ADMIN_MAIL}'
+      - '--certificatesresolvers.resolver.acme.storage=/letsencrypt/acme.json'
+      - '--certificatesresolvers.resolver.acme.dnschallenge.resolvers=1.1.1.1,1.0.0.1'
+      - '--serversTransport.insecureSkipVerify=true'
     restart: unless-stopped
     labels:
-      readme.description: Network-wide ads & trackers blocking DNS server.
-      readme.links.docker: https://hub.docker.com/r/adguard/adguardhome
-  certbot:
-    image: certbot/dns-cloudflare:v5.0.0@sha256:0dbdb8667052256f5ebdd8a56bbf24cf80b6045a9520fdfb5575c087011341ee
-    container_name: certbot
-    volumes:
-      - ${DATA_DIR}/certbot:/etc/letsencrypt
-      - ./certbot/renewal-hooks:/etc/letsencrypt/renewal-hooks
-      - ./certbot/entrypoint.sh:/entrypoint.sh
-      - /var/run/docker.sock:/var/run/docker.sock
-    secrets:
-      - certbot_cloudflare
-    entrypoint: /entrypoint.sh
-    labels:
-      readme.description: ACME client with DNS challenge support for Cloudflare.
-      readme.links.docker: https://hub.docker.com/r/certbot/dns-cloudflare
-    privileged: true
+      readme.description: The Cloud Native Application Proxy.
+      readme.links.github: https://github.com/traefik/traefik
+      traefik.enable: true
+      traefik.http.routers.api.entrypoints: https
+      traefik.http.routers.api.rule: Host(`traefik.${HOST}`)
+      traefik.http.services.traefik.loadbalancer.server.port: 8080
+    hostname: traefik
 secrets:
-  certbot_cloudflare:
-    file: ./.secrets/certbot_cloudflare
+  cloudflare_dns_api_token:
+    file: ./.secrets/cloudflare_dns_api_token
+  cloudflare_zone_api_token:
+    file: ./.secrets/cloudflare_zone_api_token

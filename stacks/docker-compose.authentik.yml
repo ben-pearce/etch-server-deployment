@@ -1,0 +1,154 @@
+name: authentik
+services:
+  authentik-postgres:
+    image: postgres:17.6@sha256:feff5b24fedd610975a1f5e743c51a4b360437f4dc3a11acf740dcd708f413f6
+    container_name: authentik-postgres
+    volumes:
+      - ${DATA_DIR}/postgres/authentik:/var/lib/postgresql/data
+    secrets:
+      - authentik_postgres_password
+    environment:
+      POSTGRES_DB: authentik
+      POSTGRES_PASSWORD_FILE: /run/secrets/authentik_postgres_password
+      POSTGRES_USER: authentik
+    healthcheck:
+      interval: 30s
+      retries: 5
+      start_period: 20s
+      test:
+        - CMD-SHELL
+        - pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}
+      timeout: 5s
+    networks:
+      - authentik
+    restart: unless-stopped
+    tmpfs:
+      - /var/lib/postgresql/data/pg_stat_tmp:rw,mode=1777
+  authentik-redis:
+    image: redis:8.2.1@sha256:acb90ced0bd769b7c04cb4c32c4494ba7b3e0ee068bdbfff0eeb0d31c2a21078
+    container_name: authentik-redis
+    command: --save 60 1 --loglevel warning
+    healthcheck:
+      interval: 30s
+      retries: 5
+      start_period: 20s
+      test:
+      - CMD-SHELL
+      - redis-cli ping | grep PONG
+      timeout: 3s
+    volumes:
+      - ${DATA_DIR}/redis/authentik:/data
+    networks:
+      - authentik
+    restart: unless-stopped
+  authentik-server:
+    image: ghcr.io/goauthentik/server:2025.8.3@sha256:d4747a324d489d0436eb91cf02301d5a47bac455efad0e0ac56b3c193991067d
+    container_name: authentik-server
+    command: server
+    user: ${PUID}:${PGID}
+    depends_on:
+      authentik-postgres:
+        condition: service_healthy
+      authentik-redis:
+        condition: service_healthy
+    environment:
+      AUTHENTIK_POSTGRESQL__HOST: authentik-postgres
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/authentik_postgres_password
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_REDIS__HOST: authentik-redis
+      AUTHENTIK_SECRET_KEY: file:///run/secrets/authentik_secret_key
+      AUTHENTIK_EMAIL__HOST: ${SMTP_HOST}
+      AUTHENTIK_EMAIL__PORT: 465
+      AUTHENTIK_EMAIL__USERNAME: ${SMTP_USER}
+      AUTHENTIK_EMAIL__PASSWORD: file:///run/secrets/smtp_password
+      AUTHENTIK_EMAIL__USE_SSL: true
+      AUTHENTIK_EMAIL__FROM: ${SMTP_USER}
+    volumes:
+      - ${DATA_DIR}/authentik/media:/media
+      - ${DATA_DIR}/authentik/templates:/templates
+    secrets:
+      - authentik_postgres_password
+      - authentik_secret_key
+      - smtp_password
+    networks:
+      - authentik-web
+      - authentik
+    restart: unless-stopped
+    labels:
+      traefik.docker.network: authentik-web
+      traefik.enable: true
+      traefik.http.routers.authentik.entrypoints: https
+      traefik.http.routers.authentik.rule: Host(`authentik.${HOST}`)
+      traefik.http.services.authentik.loadbalancer.server.port: 9000
+      readme.description: Open Source Identity Provider.
+      readme.links.web: https://goauthentik.io/
+  authentik-worker:
+    image: ghcr.io/goauthentik/server:2025.8.3@sha256:d4747a324d489d0436eb91cf02301d5a47bac455efad0e0ac56b3c193991067d
+    container_name: authentik-worker
+    command: worker
+    user: ${PUID}:${PGID}
+    depends_on:
+      authentik-postgres:
+        condition: service_healthy
+      authentik-redis:
+        condition: service_healthy
+    environment:
+      AUTHENTIK_POSTGRESQL__HOST: authentik-postgres
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/authentik_postgres_password
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_REDIS__HOST: authentik-redis
+      AUTHENTIK_SECRET_KEY: file:///run/secrets/authentik_secret_key
+      AUTHENTIK_EMAIL__HOST: ${SMTP_HOST}
+      AUTHENTIK_EMAIL__PORT: 465
+      AUTHENTIK_EMAIL__USERNAME: ${SMTP_USER}
+      AUTHENTIK_EMAIL__PASSWORD: file:///run/secrets/smtp_password
+      AUTHENTIK_EMAIL__USE_SSL: true
+      AUTHENTIK_EMAIL__FROM: ${SMTP_USER}
+    volumes:
+      - ${DATA_DIR}/authentik/media:/media
+      - ${DATA_DIR}/authentik/certs:/certs
+      - ${DATA_DIR}/authentik/templates:/templates
+    secrets:
+      - authentik_postgres_password
+      - authentik_secret_key
+      - smtp_password
+    networks:
+      - authentik
+    restart: unless-stopped
+  authentik-ldap:
+    image: ghcr.io/goauthentik/ldap:2025.8.3@sha256:7f6c754dfcbb538e2511803085f95253735843c8b873c2332c2ad291ae17d571
+    container_name: authentik-ldap
+    user: ${PUID}:${PGID}
+    ports:
+      - '0.0.0.0:389:3389/tcp'
+    environment:
+      AUTHENTIK_HOST: https://authentik.etch.benpearce.io
+      AUTHENTIK_TOKEN: file:///run/secrets/authentik_ldap_token
+    networks:
+      - authentik-web
+    secrets:
+      - authentik_ldap_token
+    restart: unless-stopped
+    labels:
+      traefik.enable: true
+      traefik.tcp.routers.authentik-ldap.entrypoints: ldaps
+      traefik.tcp.routers.authentik-ldap.rule: HostSNI(`authentik.${HOST}`)
+      traefik.tcp.routers.authentik-ldap.tls: true
+      traefik.tcp.routers.authentik-ldap.service: authentik-ldap
+      traefik.tcp.services.authentik-ldap.loadbalancer.server.port: 3389
+networks:
+  authentik:
+    name: authentik
+  authentik-web:
+    name: authentik-web
+secrets:
+  authentik_postgres_password:
+    file: ../.secrets/authentik_postgres_password
+  authentik_ldap_token:
+    file: ../.secrets/authentik_ldap_token
+  authentik_secret_key:
+    file: ../.secrets/authentik_secret_key
+  smtp_password:
+    file: ../.secrets/smtp_password
