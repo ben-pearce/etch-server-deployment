@@ -18,10 +18,10 @@ services:
       - CF_DNS_API_TOKEN_FILE=/run/secrets/cloudflare_dns_api_token
     # dclint disable-line no-unbound-port-interfaces
     ports:
+      - '${DNS_INTERFACE}:853:853/tcp'
       - '0.0.0.0:80:80'
       - '0.0.0.0:443:443'
       - '0.0.0.0:636:636'
-      - '${DNS_INTERFACE}:853:853/tcp'
     networks:
       - adguardhome-web
       - authentik-web
