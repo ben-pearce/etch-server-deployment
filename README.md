@@ -4,8 +4,13 @@
 
 | **Name** | **Description** | **Ports** | **Links** |
 |---|---|---|---|
-| [adguardhome](./docker-compose.yml#L7)  | Network-wide ads & trackers blocking DNS server. | `${DNS_INTERFACE}:53:53/tcp`, `${DNS_INTERFACE}:53:53/udp`, `${DNS_INTERFACE}:853:853/tcp`, `0.0.0.0:80:80`, `0.0.0.0:443:443` | [Docker Hub](https://hub.docker.com/r/adguard/adguardhome) |
-| [certbot](./docker-compose.yml#L25)  | ACME client with DNS challenge support for Cloudflare. |  | [Docker Hub](https://hub.docker.com/r/certbot/dns-cloudflare) |
+| [traefik](./docker-compose.yml#L9)  | The Cloud Native Application Proxy. | `0.0.0.0:80:80`, `0.0.0.0:443:443`, `0.0.0.0:636:636`, `${DNS_INTERFACE}:853:853/tcp` | [GitHub](https://github.com/traefik/traefik) |
+| [adguardhome](./stacks/docker-compose.adguardhome.yml#L5)  | Network-wide ads & trackers blocking DNS server. | `${DNS_INTERFACE}:53:53/tcp`, `${DNS_INTERFACE}:53:53/udp` | [Docker Hub](https://hub.docker.com/r/adguard/adguardhome) |
+| [authentik-postgres](./stacks/docker-compose.authentik.yml#L5)  |  |  |  |
+| [authentik-redis](./stacks/docker-compose.authentik.yml#L29)  |  |  |  |
+| [authentik-server](./stacks/docker-compose.authentik.yml#L46)  | Open Source Identity Provider. |  | [Website](https://goauthentik.io/) |
+| [authentik-worker](./stacks/docker-compose.authentik.yml#L88)  |  |  |  |
+| [authentik-ldap](./stacks/docker-compose.authentik.yml#L122)  |  | `0.0.0.0:389:3389/tcp` |  |
 | [portainer-agent](./stacks/docker-compose.monitoring.yml#L5)  | Portainer edge agent. |  | [GitHub](https://github.com/portainer/agent) |
 | [zabbix-agent](./stacks/docker-compose.monitoring.yml#L21)  | Zabbix agent for monitoring. |  | [Docker Hub](https://hub.docker.com/r/zabbix/zabbix-agent) |
 
@@ -16,11 +21,16 @@ The `.env` file stores environment variables to make starting the containers eas
 
 | **Variable** | **Description** | **Example** |
 |---|---|---|
+| `HOST` | The main host for web-based services. | `etch` |
+| `SMTP_HOST` | SMTP mail server host. | `mail.example.com` |
+| `SMTP_USER` | SMTP username. | `postmaster@example.com` |
 | `PUID` | System user ID to run containers as. | `1000` |
 | `PGID` | System group ID to run containers as. | `1000` |
 | `DNS_INTERFACE` | Interface to listen for DNS requests on. | `0.0.0.0` |
 | `CONFIG_DIR` | Location of config storage on host. | `config` |
 | `DATA_DIR` | Location of data storage on host. | `data` |
+| `ADMIN_EMAIL` | Administrative email address. | `somebody@example.com` |
+| `LAN_SUBNET` | Local subnet. | `10.0.0.0/24` |
 | `ZBX_HOSTNAME` | Zabbix server hostname. | `zabbix-server` |
 | `ZBX_SERVER_HOST` | Zabbix monitoring server host. | `zabbix.example.com` |
 | `ZBX_REFRESHACTIVECHECKS` | Zabbix active check interval. | `60` |
