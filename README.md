@@ -4,13 +4,13 @@
 
 | **Name** | **Description** | **Ports** | **Links** |
 |---|---|---|---|
-| [traefik](./docker-compose.yml#L9)  | The Cloud Native Application Proxy. | `0.0.0.0:80:80`, `0.0.0.0:443:443`, `0.0.0.0:636:636`, `${DNS_INTERFACE}:853:853/tcp` | [GitHub](https://github.com/traefik/traefik) |
+| [traefik](./docker-compose.yml#L9)  | The Cloud Native Application Proxy. | `${DNS_INTERFACE}:853:853/tcp`, `0.0.0.0:80:80`, `0.0.0.0:443:443`, `0.0.0.0:636:636` | [GitHub](https://github.com/traefik/traefik) |
 | [adguardhome](./stacks/docker-compose.adguardhome.yml#L5)  | Network-wide ads & trackers blocking DNS server. | `${DNS_INTERFACE}:53:53/tcp`, `${DNS_INTERFACE}:53:53/udp` | [Docker Hub](https://hub.docker.com/r/adguard/adguardhome) |
-| [authentik-postgres](./stacks/docker-compose.authentik.yml#L5)  |  |  |  |
-| [authentik-redis](./stacks/docker-compose.authentik.yml#L29)  |  |  |  |
-| [authentik-server](./stacks/docker-compose.authentik.yml#L46)  | Open Source Identity Provider. |  | [Website](https://goauthentik.io/) |
-| [authentik-worker](./stacks/docker-compose.authentik.yml#L88)  |  |  |  |
-| [authentik-ldap](./stacks/docker-compose.authentik.yml#L122)  |  | `0.0.0.0:389:3389/tcp` |  |
+| [authentik-ldap](./stacks/docker-compose.authentik.yml#L5)  |  | `0.0.0.0:389:3389/tcp` |  |
+| [authentik-postgres](./stacks/docker-compose.authentik.yml#L26)  |  |  |  |
+| [authentik-redis](./stacks/docker-compose.authentik.yml#L50)  |  |  |  |
+| [authentik-server](./stacks/docker-compose.authentik.yml#L67)  | Open Source Identity Provider. |  | [Website](https://goauthentik.io/) |
+| [authentik-worker](./stacks/docker-compose.authentik.yml#L109)  |  |  |  |
 | [portainer-agent](./stacks/docker-compose.monitoring.yml#L5)  | Portainer edge agent. |  | [GitHub](https://github.com/portainer/agent) |
 | [zabbix-agent](./stacks/docker-compose.monitoring.yml#L21)  | Zabbix agent for monitoring. |  | [Docker Hub](https://hub.docker.com/r/zabbix/zabbix-agent) |
 
