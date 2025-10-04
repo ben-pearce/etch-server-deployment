@@ -8,9 +8,9 @@
 | [adguardhome](./stacks/docker-compose.adguardhome.yml#L5)  | Network-wide ads & trackers blocking DNS server. | `${DNS_INTERFACE}:53:53/tcp`, `${DNS_INTERFACE}:53:53/udp` | [Docker Hub](https://hub.docker.com/r/adguard/adguardhome) |
 | [authentik-ldap](./stacks/docker-compose.authentik.yml#L5)  |  | `0.0.0.0:389:3389/tcp` |  |
 | [authentik-postgres](./stacks/docker-compose.authentik.yml#L26)  |  |  |  |
-| [authentik-redis](./stacks/docker-compose.authentik.yml#L50)  |  |  |  |
-| [authentik-server](./stacks/docker-compose.authentik.yml#L67)  | Open Source Identity Provider. |  | [Website](https://goauthentik.io/) |
-| [authentik-worker](./stacks/docker-compose.authentik.yml#L109)  |  |  |  |
+| [authentik-redis](./stacks/docker-compose.authentik.yml#L49)  |  |  |  |
+| [authentik-server](./stacks/docker-compose.authentik.yml#L66)  | Open Source Identity Provider. |  | [Website](https://goauthentik.io/) |
+| [authentik-worker](./stacks/docker-compose.authentik.yml#L108)  |  |  |  |
 | [portainer-agent](./stacks/docker-compose.monitoring.yml#L5)  | Portainer edge agent. |  | [GitHub](https://github.com/portainer/agent) |
 | [zabbix-agent](./stacks/docker-compose.monitoring.yml#L21)  | Zabbix agent for monitoring. |  | [Docker Hub](https://hub.docker.com/r/zabbix/zabbix-agent) |
 
