@@ -142,6 +142,9 @@ networks:
     name: authentik
   authentik-web:
     name: authentik-web
+volumes:
+  authentik-postgres:
+    name: authentik-postgres
 secrets:
   authentik_postgres_password:
     file: ../.secrets/authentik_postgres_password
@@ -151,6 +154,3 @@ secrets:
     file: ../.secrets/authentik_secret_key
   smtp_password:
     file: ../.secrets/smtp_password
-volumes:
-  authentik-postgres:
-    name: authentik-postgres
