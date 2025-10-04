@@ -63,7 +63,7 @@ services:
         - redis-cli ping | grep PONG
       timeout: 3s
   authentik-server:
-    image: ghcr.io/goauthentik/server:2025.8.3@sha256:d4747a324d489d0436eb91cf02301d5a47bac455efad0e0ac56b3c193991067d
+    image: ghcr.io/goauthentik/server:2025.8.4@sha256:a10398480e7f8292dbcc27b64fe572f6abed6220bd40f4b6d28e9c12d4b78dca
     container_name: authentik-server
     depends_on:
       authentik-postgres:
@@ -105,7 +105,7 @@ services:
       readme.links.web: https://goauthentik.io/
     user: ${PUID}:${PGID}
   authentik-worker:
-    image: ghcr.io/goauthentik/server:2025.8.3@sha256:d4747a324d489d0436eb91cf02301d5a47bac455efad0e0ac56b3c193991067d
+    image: ghcr.io/goauthentik/server:2025.8.4@sha256:a10398480e7f8292dbcc27b64fe572f6abed6220bd40f4b6d28e9c12d4b78dca
     container_name: authentik-worker
     depends_on:
       authentik-postgres:
