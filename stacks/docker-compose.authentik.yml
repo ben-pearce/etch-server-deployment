@@ -25,7 +25,8 @@ services:
     image: postgres:17.6@sha256:cecd364cc7ec03ab6148ab650efc5200548a89fd2e4f47a8ba6e6cf08c18805d
     container_name: authentik-postgres
     volumes:
-      - ${DATA_DIR}/postgres/authentik:/var/lib/postgresql/data
+      - authentik-postgres:/var/lib/postgresql/data
+      - ${DATA_DIR}/postgres/authentik:/docker-entrypoint-initdb.d
     secrets:
       - authentik_postgres_password
     environment:
@@ -43,8 +44,6 @@ services:
         - CMD-SHELL
         - pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}
       timeout: 5s
-    tmpfs:
-      - /var/lib/postgresql/data/pg_stat_tmp:rw,mode=1777
   authentik-redis:
     image: redis:8.2.1@sha256:acb90ced0bd769b7c04cb4c32c4494ba7b3e0ee068bdbfff0eeb0d31c2a21078
     container_name: authentik-redis
@@ -152,3 +151,6 @@ secrets:
     file: ../.secrets/authentik_secret_key
   smtp_password:
     file: ../.secrets/smtp_password
+volumes:
+  authentik-postgres:
+    name: authentik-postgres
