@@ -4,8 +4,8 @@ services:
     image: adguard/adguardhome:v0.107.67@sha256:927dc14b3e3cbd359e84658914590270a77d54446a6565e9498bef3444c286a4
     container_name: adguardhome
     volumes:
-      - ${DATA_DIR}/adguardhome:/opt/adguardhome/work
-      - ${CONFIG_DIR}/adguardhome:/opt/adguardhome/conf
+      - ${DATA_DIR}/adguardhome/work:/opt/adguardhome/work
+      - ${DATA_DIR}/adguardhome/conf:/opt/adguardhome/conf
     # dclint disable-line no-unbound-port-interfaces
     ports:
       - '${DNS_INTERFACE}:53:53/tcp'
