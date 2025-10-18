@@ -22,10 +22,10 @@ services:
       traefik.tcp.services.authentik-ldap.loadbalancer.server.port: 3389
     user: ${PUID}:${PGID}
   authentik-postgres:
-    image: postgres:17.6@sha256:e6a4209d1a4893f2df3bdcde58f8926c3c929c4d51df90990ed1b36d83c1382a
+    image: postgres:18.0-alpine3.22@sha256:f898ac406e1a9e05115cc2efcb3c3abb3a92a4c0263f3b6f6aaae354cbb1953a
     container_name: authentik-postgres
     volumes:
-      - authentik-postgres:/var/lib/postgresql/data
+      - authentik-postgres:/var/lib/postgresql
       - ${DATA_DIR}/postgres/authentik:/docker-entrypoint-initdb.d
     secrets:
       - authentik_postgres_password
