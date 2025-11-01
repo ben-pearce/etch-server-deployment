@@ -1,7 +1,7 @@
 name: authentik
 services:
   authentik-ldap:
-    image: ghcr.io/goauthentik/ldap:2025.8.4@sha256:5948a57d5c9af9134eb22550cbc4084c8d441fd00c2cab250f4a1445727d3262
+    image: ghcr.io/goauthentik/ldap:2025.10.0@sha256:c5e546fb77d7314c0b70ae510b7643400af62e4217e26dbfd4c1463778cb6274
     container_name: authentik-ldap
     secrets:
       - authentik_ldap_token
