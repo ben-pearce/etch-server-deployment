@@ -4,7 +4,7 @@
 
 | **Name** | **Description** | **Ports** | **Links** |
 |---|---|---|---|
-| [traefik](./docker-compose.yml#L9)  | The Cloud Native Application Proxy. | `${DNS_INTERFACE}:853:853/tcp`, `0.0.0.0:80:80`, `0.0.0.0:443:443`, `0.0.0.0:636:636` | [GitHub](https://github.com/traefik/traefik) |
+| [traefik](./docker-compose.yml#L9)  | The Cloud Native Application Proxy. | `${DNS_INTERFACE}:853:853/tcp`, `0.0.0.0:80:80`, `0.0.0.0:443:443/tcp`, `0.0.0.0:443:443/udp`, `0.0.0.0:636:636` | [GitHub](https://github.com/traefik/traefik) |
 | [adguardhome](./stacks/docker-compose.adguardhome.yml#L5)  | Network-wide ads & trackers blocking DNS server. | `${DNS_INTERFACE}:53:53/tcp`, `${DNS_INTERFACE}:53:53/udp` | [Docker Hub](https://hub.docker.com/r/adguard/adguardhome) |
 | [authentik-ldap](./stacks/docker-compose.authentik.yml#L5)  |  | `0.0.0.0:389:3389/tcp` |  |
 | [authentik-postgres](./stacks/docker-compose.authentik.yml#L26)  |  |  |  |
