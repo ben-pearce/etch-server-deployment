@@ -20,7 +20,8 @@ services:
     ports:
       - '${DNS_INTERFACE}:853:853/tcp'
       - '0.0.0.0:80:80'
-      - '0.0.0.0:443:443'
+      - '0.0.0.0:443:443/tcp'
+      - '0.0.0.0:443:443/udp'
       - '0.0.0.0:636:636'
     networks:
       - adguardhome-web
@@ -37,6 +38,7 @@ services:
       - '--entrypoints.https.address=:443'
       - '--entrypoints.https.forwardedheaders.trustedips=${LAN_SUBNET}'
       - '--entrypoints.https.http.tls=true'
+      - '--entrypoints.https.http3'
       - '--entrypoints.https.http.tls.certResolver=resolver'
       - '--entrypoints.https.http.tls.domains[0].main=${HOST}'
       - '--entrypoints.https.http.tls.domains[0].sans=*.${HOST}'
