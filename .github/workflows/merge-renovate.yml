@@ -26,7 +26,7 @@ jobs:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           prs=$(gh pr list \
-            --author "renovate[bot]" \
+            --author "ben-pearce-renovate-homelab[bot]" \
             --state open \
             --json number,title,headRefName,mergeable,reviews \
             --jq '.[] | select(.mergeable == "MERGEABLE" or .mergeable == "UNKNOWN") | .number')
@@ -39,8 +39,7 @@ jobs:
           echo "$prs" | while read -r pr; do
             echo "Merging PR #$pr..."
             gh pr merge "$pr" \
-              --squash \
+              --merge \
               --auto \
-              --subject "chore(deps): $(gh pr view "$pr" --json title --jq '.title')" \
               || echo "Failed to merge PR #$pr"
           done
