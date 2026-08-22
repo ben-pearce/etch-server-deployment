@@ -1,7 +1,7 @@
 name: authentik
 services:
   authentik-ldap:
-    image: ghcr.io/goauthentik/ldap:2026.5.6@sha256:68a595f5a7b75fb3615f1609725adaf1d45f743aafece715d943b9706074c307
+    image: ghcr.io/goauthentik/ldap:2026.8.0@sha256:ca356fd416528f15d6fd2c07ced9b414a0db902636efe378bf1bf45a86db31e7
     container_name: authentik-ldap
     secrets:
       - authentik_ldap_token
@@ -62,7 +62,7 @@ services:
         - redis-cli ping | grep PONG
       timeout: 3s
   authentik-server:
-    image: ghcr.io/goauthentik/server:2026.5.6@sha256:ed120caf710ccf82ef0026f0bc74e51615bc95ebff228a7a2d6fc60c441c3868
+    image: ghcr.io/goauthentik/server:2026.8.0@sha256:7421753cfea67e89a6d295a1f0173ccea3866b33768c88dad90453b151cdcfd5
     container_name: authentik-server
     depends_on:
       authentik-postgres:
@@ -104,7 +104,7 @@ services:
       readme.links.web: https://goauthentik.io/
     user: ${PUID}:${PGID}
   authentik-worker:
-    image: ghcr.io/goauthentik/server:2026.5.6@sha256:ed120caf710ccf82ef0026f0bc74e51615bc95ebff228a7a2d6fc60c441c3868
+    image: ghcr.io/goauthentik/server:2026.8.0@sha256:7421753cfea67e89a6d295a1f0173ccea3866b33768c88dad90453b151cdcfd5
     container_name: authentik-worker
     depends_on:
       authentik-postgres:
