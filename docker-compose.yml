@@ -14,8 +14,8 @@ services:
       - cloudflare_dns_api_token
       - cloudflare_zone_api_token
     environment:
-      - CF_ZONE_API_TOKEN_FILE=/run/secrets/cloudflare_zone_api_token
-      - CF_DNS_API_TOKEN_FILE=/run/secrets/cloudflare_dns_api_token
+      CF_ZONE_API_TOKEN_FILE: /run/secrets/cloudflare_zone_api_token
+      CF_DNS_API_TOKEN_FILE: /run/secrets/cloudflare_dns_api_token
     # dclint disable-line no-unbound-port-interfaces
     ports:
       - '${DNS_INTERFACE}:853:853/tcp'
